@@ -1,4 +1,20 @@
 /*
+    Copyright (C) 2020 Lubomir Bogdanov
+    Contributor Lubomir Bogdanov <lbogdanov@tu-sofia.bg>
+    This file is part of fifo_multi.
+    fifo_multi is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    fifo_multi is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License
+    along with fifo_multi.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*
  * fifo_multi.c
  *
  *  Created on: Jun 18, 2020
@@ -29,9 +45,12 @@ void fifo_init(void){
 }
 
 /*!
- * \brief
+ * \brief A function for pushing elements in a FIFO.
  *
- * \param fifo_number -
+ * \param fifo_number - a digit between 0 and FIFO_NUMBERS that 
+ * denotes the FIFO channel currently being used.
+ *
+ * \param element - an 8-bit value to be pushed in the FIFO. 
  *
  * \return 0 - element pushed successfully, 1 - fifo is full
  * and element was not pushed
@@ -67,9 +86,12 @@ uint8_t fifo_push(uint8_t fifo_number, uint8_t element){
 }
 
 /*!
- * \brief
+ * \brief A function for poping elements from a FIFO.
  *
- * \param fifo_number -
+ * \param fifo_number - a digit between 0 and FIFO_NUMBERS that 
+ * denotes the FIFO channel currently being used.
+ *
+ * \param element - an 8-bit value that is popped from the FIFO. 
  *
  * \return 0 - element popped successfully, 1 - fifo is
  * empty and element was filled with zero.
@@ -101,7 +123,12 @@ uint8_t fifo_pop(uint8_t fifo_number, uint8_t *element){
 }
 
 /*!
- * \brief
+ * \brief A function for checking whether there are any elements
+ * left before popping them. The FIFO remains unchanged by this
+ * function.
+ *
+ * \param fifo_number - a digit between 0 and FIFO_NUMBERS that 
+ * denotes the FIFO channel currently being used.
  *
  * \return 0 - fifo has elements, 1 - fifo is empty
  */
