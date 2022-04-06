@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Lubomir Bogdanov
+    Copyright (C) 2022 Lubomir Bogdanov
     Contributor Lubomir Bogdanov <lbogdanov@tu-sofia.bg>
     This file is part of fifo_multi.
     fifo_multi is free software: you can redistribute it and/or modify
@@ -36,6 +36,13 @@ int main(void) {
 	}
 	printf("\n");
 
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
+
 	printf("Popping:\n");
 	for(i = 0; i < 10; i++){
 		if(fifo_pop(0, &value)){
@@ -48,6 +55,13 @@ int main(void) {
 		}
 	}
 	printf("\n");
+
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
 
 	printf("==============================\n");
 
@@ -65,6 +79,13 @@ int main(void) {
 	}
 	printf("\n");
 
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
+
 	printf("Popping:\n");
 	for(i = 0; i < 20; i++){
 		if(fifo_pop(0, &value)){
@@ -77,6 +98,13 @@ int main(void) {
 		}
 	}
 	printf("\n");
+
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
 
 	printf("==============================\n");
 
@@ -94,6 +122,13 @@ int main(void) {
 	}
 	printf("\n");
 
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
+
 	printf("Popping:\n");
 	for(i = 0; i < 30; i++){
 		if(fifo_pop(0, &value)){
@@ -106,6 +141,13 @@ int main(void) {
 		}
 	}
 	printf("\n");
+
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
 
 	printf("==============================\n");
 	//Expected one 'f'
@@ -122,6 +164,13 @@ int main(void) {
 	}
 	printf("\n");
 
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
+
 	printf("Popping:\n");
 	for(i = 0; i < 2; i++){
 		if(fifo_pop(0, &value)){
@@ -134,6 +183,13 @@ int main(void) {
 		}
 	}
 	printf("\n");
+
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
 
 	printf("Pushing:\n");
 	for(i = 40; i < 47; i++){
@@ -149,7 +205,8 @@ int main(void) {
 	printf("\n");
 
 	printf("==============================\n");
-	if(fifo_peek(0)){
+	//Expected two 'e'
+	if(fifo_is_empty(0)){
 		printf("Fifo is empty!\n");
 	}
 	else{
@@ -169,14 +226,19 @@ int main(void) {
 	}
 	printf("\n");
 
-	if(fifo_peek(0)){
+	if(fifo_peek(0, &value)){
+		printf("top: n/a\n");
+	}
+	else{
+		printf("top: %d\n", value);
+	}
+
+	if(fifo_is_empty(0)){
 		printf("Fifo is empty!\n");
 	}
 	else{
 		printf("Fifo has elements!\n");
 	}
-
-
 
 	return 0;
 }

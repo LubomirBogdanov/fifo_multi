@@ -1,4 +1,4 @@
-#    Copyright (C) 2020 Lubomir Bogdanov
+#    Copyright (C) 2022 Lubomir Bogdanov
 #    Contributor Lubomir Bogdanov <lbogdanov@tu-sofia.bg>
 #    This file is part of fifo_multi.
 #    fifo_multi is free software: you can redistribute it and/or modify
@@ -12,57 +12,29 @@
 #    You should have received a copy of the GNU Lesser General Public License
 #    along with fifo_multi.  If not, see <http://www.gnu.org/licenses/>.
 
-PROJECT			= main
-#Add additional files here. The ${PROJECT}.c should be at the end.
-SRC			= fifo_multi.c main.c   
+OUTDIR	= debug
+SRCDIR	= src
+BINNAME	= main
+INC		= ${wildcard ${SRCDIR}/*.h}
+SRC		= ${wildcard ${SRCDIR}/*.c} 
+CC		= gcc
+SIZE	= size
+CLAGS	= -Wall -Werror -O0 -g3 -I.
 
-INDIR			= src
-OUTDIR			= gcc
-OBJ			= ${SRC:%.c=${OUTDIR}/%.o}
-
-CPU			= cortex-m0
-INSTRSET		= thumb
-CC              	= gcc
-LD			= ld
-OBJCOPY			= objcopy
-OBJDUMP			= objdump
-SIZE			= size
-PREPROCESSOR		= 
-IPATH			= 
-OPTFLAGS		= -O0 -fno-common -Wall -c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -MMD -MP -MF"${@:${OUTDIR}/%.o=${OUTDIR}/%.d}" -MT"${@:${OUTDIR}/%.o=${OUTDIR}/%.o}" -MT"${@:${OUTDIR}/%.o=${OUTDIR}/%.d}"
-DEBUGFLAGS		= -g3
-CFLAGS          	= ${PREPROCESSOR} -I${IPATH} ${OPTFLAGS} ${DEBUGFLAGS}
-LINKER_FILE		= 
-LDFLAGS			= -Xlinker --gc-sections -Xlinker -print-memory-usage
-OBJDUMPFLAGS		= -D -S
-SIZEFLAGS		= -d
- 
-
-.PHONY: ${OUTDIR}/${PROJECT} ${OBJ}
-all: ${OUTDIR} ${OUTDIR}/${PROJECT} size
+all: ${OUTDIR} ${OUTDIR}/${BINNAME} bin_size
 
 ${OUTDIR}:
-	@mkdir -p ${OUTDIR}
+	mkdir -p ${OUTDIR}
 	
-${OUTDIR}/${PROJECT}: ${OBJ}
-	@echo 'Building target: $@'
-	@echo 'Invoking: Linker'
-	${CC} ${LDFLAGS} -o "${OUTDIR}/${PROJECT}" ${SRC:%.c=${OUTDIR}/%.o} 
-	@echo ' '
+${OUTDIR}/${BINNAME}: ${SRC} ${INC}
+	${CC} ${CFLAGS} ${SRC} -o ${OUTDIR}/${BINNAME}
 
-${OBJ}: ${SRC:${INDIR}/%.c}
-	@echo 'Building file: $@'
-	@echo 'Invoking: C Compiler'
-	${CC} ${CFLAGS} -o ${@} ${@:${OUTDIR}/%.o=${INDIR}/%.c}
-	@echo ' '
+bin_size:
+	${SIZE} ${OUTDIR}/${BINNAME}
 	
-${OUTDIR}/${PROJECT}.lst: 
-	${OBJDUMP} ${OBJDUMPFLAGS} ${OUTDIR}/${PROJECT}_${MCU_INDEX}.axf > ${OUTDIR}/${PROJECT}.lst
-
-size:
-	${SIZE} ${SIZEFLAGS} ${OUTDIR}/${PROJECT}
+run:
+	./${OUTDIR}/${BINNAME}
 
 clean:
 	@echo 'Removing directory: ${OUTDIR}'
 	rm -r ${OUTDIR} 
-	@echo ' '

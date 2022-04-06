@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Lubomir Bogdanov
+    Copyright (C) 2022 Lubomir Bogdanov
     Contributor Lubomir Bogdanov <lbogdanov@tu-sofia.bg>
     This file is part of fifo_multi.
     fifo_multi is free software: you can redistribute it and/or modify
@@ -22,26 +22,47 @@
  */
 #include "fifo_multi.h"
 
+/*!
+ * \struct fifo_buff_t
+ *
+ * \brief A structure describing
+ * a FIFO buffer.
+ *
+ */
 typedef struct {
-	uint8_t overflow;
-	uint8_t head_index;
-	uint8_t tail_index;
+	int8_t head_index;
+	int8_t tail_index;
 	uint8_t data[FIFO_SIZE];
 }fifo_buff_t;
 
+/*!
+ * \var fifo_bf
+ *
+ * \brief A static array of FIFOs.
+ * Change the number of FIFOs by modifying the
+ * FIFO_NUMBERS macro according to your application
+ * needs.
+ */
 fifo_buff_t fifo_bf[FIFO_NUMBERS];
 
+/*!
+ * \brief Initialize the FIFOs. No dynamic
+ * allocation of memory is used to make it more
+ * embedded system-friendly.
+ *
+ * \return None.
+ */
 void fifo_init(void){
 	uint8_t i, j;
 
-	for(i = 0; i < FIFO_NUMBERS; i++){
-		fifo_bf[i].overflow = 0;
-		fifo_bf[i].head_index = 0;
-		fifo_bf[i].tail_index = 0;
+	for(i = 0; i < FIFO_NUMBERS; i++){	
+		fifo_bf[i].head_index = FIFO_SIZE-1;
+		fifo_bf[i].tail_index = fifo_bf[i].head_index;
+		
 		for(j = 0; j < FIFO_SIZE; j++){
 			fifo_bf[i].data[j] = 0x00;
 		}
-	}
+	}	
 }
 
 /*!
@@ -52,35 +73,15 @@ void fifo_init(void){
  *
  * \param element - an 8-bit value to be pushed in the FIFO. 
  *
- * \return 0 - element pushed successfully, 1 - fifo is full
- * and element was not pushed
+ * \return 0 - element pushed successfully, 1 - FIFO is full
+ * and element was not pushed.
  */
 uint8_t fifo_push(uint8_t fifo_number, uint8_t element){
-	uint8_t tmp_index;
-
-	tmp_index = fifo_bf[fifo_number].head_index;
-
-	if(tmp_index == FIFO_SIZE){
-		if(fifo_bf[fifo_number].tail_index == 0){
-			return 1;
-		}
-		else{
-			tmp_index = 0;
-			fifo_bf[fifo_number].overflow = 1;
-		}
+	if(fifo_bf[fifo_number].tail_index < 0){
+		return 1;
 	}
 
-	if(fifo_bf[fifo_number].overflow){
-		if(tmp_index == fifo_bf[fifo_number].tail_index){
-			return 1;
-		}
-	}
-
-	fifo_bf[fifo_number].data[tmp_index] = element;
-
-	tmp_index++;
-
-	fifo_bf[fifo_number].head_index = tmp_index;
+	fifo_bf[fifo_number].data[fifo_bf[fifo_number].tail_index--] = element;
 
 	return 0;
 }
@@ -93,31 +94,23 @@ uint8_t fifo_push(uint8_t fifo_number, uint8_t element){
  *
  * \param element - an 8-bit value that is popped from the FIFO. 
  *
- * \return 0 - element popped successfully, 1 - fifo is
- * empty and element was filled with zero.
+ * \return 0 - element popped successfully, 1 - FIFO is
+ * empty and element remains unchanged.
  */
 uint8_t fifo_pop(uint8_t fifo_number, uint8_t *element){
-	uint8_t tmp_index;
+	int i;
 
-	tmp_index = fifo_bf[fifo_number].tail_index;
-
-	if(!fifo_bf[fifo_number].overflow){
-		if(tmp_index == fifo_bf[fifo_number].head_index){
-			*element = 0;
-			return 1;
-		}
+	if(fifo_bf[fifo_number].tail_index == fifo_bf[fifo_number].head_index){
+		return 1;
 	}
 
-	*element = fifo_bf[fifo_number].data[tmp_index];
+	*element = fifo_bf[fifo_number].data[fifo_bf[fifo_number].head_index];
 
-	tmp_index++;
-
-	if(tmp_index == FIFO_SIZE){
-		fifo_bf[fifo_number].overflow = 0;
-		tmp_index = 0;
+	for(i = FIFO_SIZE-1; i > 0 ; i--){
+		fifo_bf[fifo_number].data[i] = fifo_bf[fifo_number].data[i-1];
 	}
 
-	fifo_bf[fifo_number].tail_index = tmp_index;
+	fifo_bf[fifo_number].tail_index++;
 
 	return 0;
 }
@@ -129,19 +122,34 @@ uint8_t fifo_pop(uint8_t fifo_number, uint8_t *element){
  *
  * \param fifo_number - a digit between 0 and FIFO_NUMBERS that 
  * denotes the FIFO channel currently being used.
+ * \param top_element - a pointer to an 8-bit variable that will
+ * hold the top element of the FIFO, if it exists. If the FIFO
+ * is empty, top_element remains unchanged.
  *
- * \return 0 - fifo has elements, 1 - fifo is empty
+ * \return 0 - FIFO has elements, 1 - FIFO is empty.
  */
-uint8_t fifo_peek(uint8_t fifo_number){
-	uint8_t tmp_index;
-
-	tmp_index = fifo_bf[fifo_number].tail_index;
-
-	if(!fifo_bf[fifo_number].overflow){
-		if(tmp_index == fifo_bf[fifo_number].head_index){
-			return 1;
-		}
+uint8_t fifo_peek(uint8_t fifo_number, uint8_t *top_element){
+	if(fifo_bf[fifo_number].tail_index != fifo_bf[fifo_number].head_index){
+		*top_element = fifo_bf[fifo_number].data[fifo_bf[fifo_number].head_index];
+		return 0;
 	}
 
-	return 0;
+	return 1;
+}
+
+/*!
+ * \brief A function for checking whether there are any
+ * elements left in the FIFO.
+ *
+ *\param fifo_number - a digit between 0 and FIFO_NUMBERS that
+ * denotes the FIFO channel currently being used.
+ *
+ * \return 0 - buffer has elements, 1 - FIFO buffer is empty.
+ */
+uint8_t fifo_is_empty(uint8_t fifo_number){
+	if(fifo_bf[fifo_number].tail_index != fifo_bf[fifo_number].head_index){
+		return 0;
+	}
+
+	return 1;
 }

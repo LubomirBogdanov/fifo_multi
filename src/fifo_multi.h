@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Lubomir Bogdanov
+    Copyright (C) 2022 Lubomir Bogdanov
     Contributor Lubomir Bogdanov <lbogdanov@tu-sofia.bg>
     This file is part of fifo_multi.
     fifo_multi is free software: you can redistribute it and/or modify
@@ -27,11 +27,12 @@
 #include <stdint.h>
 
 #define FIFO_SIZE		8
-#define FIFO_NUMBERS		4
+#define FIFO_NUMBERS	4
 
 void fifo_init(void);
 uint8_t fifo_push(uint8_t fifo_number, uint8_t element);
 uint8_t fifo_pop(uint8_t fifo_number, uint8_t *element);
-uint8_t fifo_peek(uint8_t fifo_number);
+uint8_t fifo_peek(uint8_t fifo_number, uint8_t *top_element);
+uint8_t fifo_is_empty(uint8_t fifo_number);
 
 #endif /* FIFO_MULTI_H_ */
