@@ -21,11 +21,11 @@ then enter the fifo_multi directory and type:
 
 make  
 
-The executable will be in ./gcc and the filename is 'main'. This is  
+The executable will be in ./debug and the filename is 'main'. This is  
 an example main program to test the functions in fifo_multi.c. To run  
 it type:  
 
-./gcc/main  
+make run  
 
   
 Example usage  
